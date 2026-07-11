@@ -36,4 +36,21 @@
     if((e.ctrlKey||e.metaKey)&&(k==='u'||k==='s')){e.preventDefault();return;}
     if((e.ctrlKey||e.metaKey)&&e.shiftKey&&(k==='i'||k==='j'||k==='c')){e.preventDefault();}
   });
+
+  // custom gold cursor ripple — 클릭 가능한 곳 위에서 커서 팁에서 링이 퍼짐 (터치기기 제외). 스타일은 dev.css
+  if(!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches)){
+    var _ring=document.createElement('div');
+    _ring.className='cursor-ripple';
+    document.body.appendChild(_ring);
+    var _cOn=false;
+    var _cSel='a[href],button,[role="button"],select,summary,label,.btn,.nav-toggle,.file-btn,.rm,.consent';
+    document.addEventListener('mousemove',function(e){
+      _ring.style.left=e.clientX+'px';
+      _ring.style.top=e.clientY+'px';
+      var el=(e.target&&e.target.closest)?e.target.closest(_cSel):null;
+      var clickable=!!el && !el.disabled && el.getAttribute('aria-disabled')!=='true';
+      if(clickable!==_cOn){ _cOn=clickable; _ring.classList.toggle('on',_cOn); }
+    },{passive:true});
+    document.addEventListener('mouseleave',function(){ _cOn=false; _ring.classList.remove('on'); });
+  }
 })();
