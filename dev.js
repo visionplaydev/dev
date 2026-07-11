@@ -37,19 +37,28 @@
     if((e.ctrlKey||e.metaKey)&&e.shiftKey&&(k==='i'||k==='j'||k==='c')){e.preventDefault();}
   });
 
-  // custom gold cursor ripple — 클릭 가능한 곳 위에서 커서 팁에서 링이 퍼짐 (터치기기 제외). 스타일은 dev.css
+  // custom indigo cursor ripple — 클릭 가능한 곳 위에서 커서 팁에서 링이 퍼짐 (터치기기 제외). 스타일은 dev.css
   if(!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches)){
     var _ring=document.createElement('div');
     _ring.className='cursor-ripple';
     document.body.appendChild(_ring);
     var _cOn=false;
     var _cSel='a[href],button,[role="button"],select,summary,label,.btn,.nav-toggle,.file-btn,.rm,.consent';
-    document.addEventListener('mousemove',function(e){
-      _ring.style.left=e.clientX+'px';
-      _ring.style.top=e.clientY+'px';
+    // pseudo 링 상시 마운트+상시 애니(dev.css)로 컴포지터 레이어 로드시 워밍 → 첫 hover 콜드스타트 없음. 초기 위치만 화면 밖.
+    _ring.style.transform='translate3d(-100px,-100px,0)';
+    // mousemove = rAF 스로틀 + transform 이동(left/top 리플로우 제거)
+    var _lastE=null,_raf=0;
+    var _paint=function(){
+      _raf=0;
+      var e=_lastE; if(!e) return;
+      _ring.style.transform='translate3d('+e.clientX+'px,'+e.clientY+'px,0)';
       var el=(e.target&&e.target.closest)?e.target.closest(_cSel):null;
       var clickable=!!el && !el.disabled && el.getAttribute('aria-disabled')!=='true';
       if(clickable!==_cOn){ _cOn=clickable; _ring.classList.toggle('on',_cOn); }
+    };
+    document.addEventListener('mousemove',function(e){
+      _lastE=e;
+      if(!_raf) _raf=requestAnimationFrame(_paint);
     },{passive:true});
     document.addEventListener('mouseleave',function(){ _cOn=false; _ring.classList.remove('on'); });
   }
