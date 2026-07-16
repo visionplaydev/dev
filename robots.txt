@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://dev.visionplaydev.uk/sitemap.xml
+Sitemap: https://visionplay.dev/sitemap.xml
